@@ -23,20 +23,21 @@ const QString TitleBar::c_menuIconForegroundName = "widgets#titlebar#menu_icon#f
 const QString TitleBar::c_menuIconDisabledForegroundName = "widgets#titlebar#menu_icon#disabled#fg";
 
 TitleBar::TitleBar(const QString &p_title,
+                   bool p_hasInfoLabel,
                    TitleBar::Actions p_actionFlags,
                    QWidget *p_parent)
     : QWidget(p_parent)
 {
-    setupUI(p_title, p_actionFlags);
+    setupUI(p_title, p_hasInfoLabel, p_actionFlags);
 }
 
-void TitleBar::setupUI(const QString &p_title, TitleBar::Actions p_actionFlags)
+void TitleBar::setupUI(const QString &p_title, bool p_hasInfoLabel, TitleBar::Actions p_actionFlags)
 {
     auto mainLayout = new QHBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
     // Title label.
-    {
+    if (!p_title.isEmpty()) {
         auto titleLabel = new QLabel(p_title, this);
         titleLabel->setProperty(c_titleProp, true);
         mainLayout->addWidget(titleLabel);
@@ -54,6 +55,13 @@ void TitleBar::setupUI(const QString &p_title, TitleBar::Actions p_actionFlags)
         setupActionButtons(p_actionFlags);
 
         setActionButtonsVisible(false);
+    }
+
+    // Info label.
+    if (p_hasInfoLabel) {
+        m_infoLabel = new QLabel(this);
+        m_infoLabel->setProperty(c_titleProp, true);
+        mainLayout->addWidget(m_infoLabel);
     }
 
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -179,4 +187,12 @@ QToolButton *TitleBar::addActionButton(const QString &p_iconName, const QString 
 QHBoxLayout *TitleBar::actionButtonLayout() const
 {
     return static_cast<QHBoxLayout *>(m_buttonWidget->layout());
+}
+
+void TitleBar::setInfoLabel(const QString &p_info)
+{
+    Q_ASSERT(m_infoLabel);
+    if (m_infoLabel) {
+        m_infoLabel->setText(p_info);
+    }
 }
